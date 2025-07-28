@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ukubona LLC - Recursive Theater Command Center</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            color: #00ff88;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .matrix-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            opacity: 0.1;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 2rem;
+            background: rgba(0, 0, 0, 0.8);
+            border-bottom: 2px solid #00ff88;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+        
+        .logo {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ff88;
+            margin-bottom: 0.5rem;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+        
+        .tagline {
+            font-size: 1.2rem;
+            color: #ff6b6b;
+            text-shadow: 0 0 5px #ff6b6b;
+        }
+        
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: rgba(0, 0, 0, 0.9);
+            border: 1px solid #00ff88;
+            border-radius: 10px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 255, 136, 0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #00ff88, transparent);
+            animation: scan 3s infinite;
+        }
+        
+        @keyframes scan {
+            0% { left: -100%; }
+            100% { left: 100%; }
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 255, 136, 0.2);
+            border-color: #ff6b6b;
+        }
+        
+        .card h3 {
+            color: #ff6b6b;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            text-shadow: 0 0 5px #ff6b6b;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 0.5rem;
+            animation: blink 1s infinite;
+        }
+        
+        .status-active {
+            background: #00ff88;
+            box-shadow: 0 0 10px #00ff88;
+        }
+        
+        .status-pending {
+            background: #ffaa00;
+            box-shadow: 0 0 10px #ffaa00;
+        }
+        
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+        
+        .avatar-showcase {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .avatar-chip {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .avatar-chip:hover {
+            background: rgba(0, 255, 136, 0.3);
+            transform: scale(1.05);
+        }
+        
+        .code-preview {
+            background: rgba(0, 0, 0, 0.8);
+            border: 1px solid #333;
+            border-radius: 5px;
+            padding: 1rem;
+            font-size: 0.85rem;
+            overflow-x: auto;
+            margin: 1rem 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+        
+        .metric {
+            text-align: center;
+            padding: 1rem;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+        }
+        
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+        
+        .metric-label {
+            font-size: 0.8rem;
+            color: #ccc;
+            margin-top: 0.5rem;
+        }
+        
+        .launch-btn {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 25px;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(255, 107, 107, 0.3);
+        }
+        
+        .launch-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 25px rgba(255, 107, 107, 0.4);
+        }
+        
+        .banter-stream {
+            height: 200px;
+            overflow-y: auto;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #333;
+        }
+        
+        .banter-line {
+            margin: 0.5rem 0;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+        
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+        
+        .avatar-name {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        
+        .system-log {
+            font-size: 0.8rem;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .recursive-visual {
+            width: 100%;
+            height: 150px;
+            background: radial-gradient(circle, rgba(0, 255, 136, 0.1) 0%, transparent 70%);
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            margin: 1rem 0;
+        }
+        
+        .fractal-element {
+            position: absolute;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 50%;
+            animation: rotate 10s linear infinite;
+        }
+        
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="matrix-bg">
+        <canvas id="matrixCanvas"></canvas>
+    </div>
+    
+    <header class="header">
+        <div class="logo">🔥 UKUBONA LLC</div>
+        <div class="tagline">Recursive Theater of Agency • Dopamine-Driven UX Engine</div>
+    </header>
+    
+    <div class="dashboard-grid">
+        <!-- Pentadic Pack Status -->
+        <div class="card">
+            <h3>🎭 Pentadic Pack Status</h3>
+            <div style="margin: 1rem 0;">
+                <div><span class="status-indicator status-active"></span><strong>God (setup.sh):</strong> Environment Ready</div>
+                <div><span class="status-indicator status-active"></span><strong>Devil (flask_api.py):</strong> Daemon Active</div>
+                <div><span class="status-indicator status-active"></span><strong>Faustian Mask:</strong> UI Rendered</div>
+                <div><span class="status-indicator status-pending"></span><strong>Schema:</strong> Avatars Loaded</div>
+                <div><span class="status-indicator status-pending"></span><strong>UX Log:</strong> Recursion Engaged</div>
+            </div>
+            <button class="launch-btn" onclick="launchBanterDaemon()">🚀 Launch Banter Daemon</button>
+        </div>
+        
+        <!-- Avatar Theater -->
+        <div class="card">
+            <h3>🎯 Avatar Theater</h3>
+            <div class="avatar-showcase">
+                <div class="avatar-chip" onclick="switchAvatar('Fortinbras')">
+                    🗡️ Fortinbras<br><small>Strategist</small>
+                </div>
+                <div class="avatar-chip" onclick="switchAvatar('Hamlet')">
+                    🎭 Hamlet<br><small>Trickster</small>
+                </div>
+            </div>
+            <div class="banter-stream" id="banterStream">
+                <div class="banter-line system-log">System: Initializing recursive theater...</div>
+                <div class="banter-line"><span class="avatar-name">Fortinbras:</span> Let's tear down the facade.</div>
+                <div class="banter-line"><span class="avatar-name">Hamlet:</span> Am I speaking to a ghost or a god?</div>
+            </div>
+        </div>
+        
+        <!-- Recursive Metrics -->
+        <div class="card">
+            <h3>📊 Dopamine Recursion Metrics</h3>
+            <div class="metrics-grid">
+                <div class="metric">
+                    <div class="metric-value" id="avatarSwitches">42</div>
+                    <div class="metric-label">Avatar Switches</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="banterLines">128</div>
+                    <div class="metric-label">Banter Lines</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="recursionDepth">7</div>
+                    <div class="metric-label">Recursion Depth</div>
+                </div>
+                <div class="metric">
+                    <div class="metric-value" id="agencyScore">∞</div>
+                    <div class="metric-label">Agency Score</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- System Architecture -->
+        <div class="card">
+            <h3>⚙️ Architecture Overview</h3>
+            <div class="code-preview">
+Flask + SocketIO + YAML Schema
+├── Real-time banter streaming
+├── Avatar state management
+├── Background thread emitters
+├── WebSocket client-server sync
+└── Jinja2 templating engine
+            </div>
+            <div class="recursive-visual">
+                <div class="fractal-element" style="width: 80px; height: 80px; top: 35px; left: 35px;"></div>
+                <div class="fractal-element" style="width: 60px; height: 60px; top: 45px; right: 45px; animation-delay: -3s;"></div>
+                <div class="fractal-element" style="width: 40px; height: 40px; bottom: 35px; left: 50%; animation-delay: -6s;"></div>
+            </div>
+        </div>
+        
+        <!-- Development Roadmap -->
+        <div class="card">
+            <h3>🗺️ Evolution Roadmap</h3>
+            <div style="line-height: 1.8;">
+                <div><span class="status-indicator status-active"></span><strong>Phase 1:</strong> Core Banter Daemon ✅</div>
+                <div><span class="status-indicator status-pending"></span><strong>Phase 2:</strong> GPT Remix Integration</div>
+                <div><span class="status-indicator status-pending"></span><strong>Phase 3:</strong> Energy/Resource Game Layer</div>
+                <div><span class="status-indicator status-pending"></span><strong>Phase 4:</strong> Visual Recursion UI</div>
+                <div><span class="status-indicator status-pending"></span><strong>Phase 5:</strong> Gaia Forest Connection</div>
+            </div>
+        </div>
+        
+        <!-- Live FITDZ Log -->
+        <div class="card">
+            <h3>📝 FITDZ-001-UX.log</h3>
+            <div class="code-preview" id="fitdzLog">
+[2025-07-28T15:42:13] Dopamine recursion trigger: ACTIVE
+[2025-07-28T15:42:14] Theater of agency: MANIFESTING
+[2025-07-28T15:42:15] Avatar channeling: HAMLET->FORTINBRAS
+[2025-07-28T15:42:16] Narrative emergence: DETECTED
+[2025-07-28T15:42:17] User engagement: RECURSIVE_LOOP
+[2025-07-28T15:42:18] Meta-layer consciousness: AWAKENING
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Matrix background effect
+        const canvas = document.getElementById('matrixCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        
+        const chars = '01アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
+        const charArray = chars.split('');
+        const fontSize = 14;
+        const columns = canvas.width / fontSize;
+        const drops = Array(Math.floor(columns)).fill(1);
+        
+        function drawMatrix() {
+            ctx.fillStyle = 'rgba(10, 10, 10, 0.05)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            ctx.fillStyle = '#00ff88';
+            ctx.font = fontSize + 'px monospace';
+            
+            for (let i = 0; i < drops.length; i++) {
+                const text = charArray[Math.floor(Math.random() * charArray.length)];
+                ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                
+                if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+                    drops[i] = 0;
+                }
+                drops[i]++;
+            }
+        }
+        
+        setInterval(drawMatrix, 50);
+        
+        // Simulate live updates
+        function updateMetrics() {
+            const avatarSwitches = document.getElementById('avatarSwitches');
+            const banterLines = document.getElementById('banterLines');
+            const recursionDepth = document.getElementById('recursionDepth');
+            
+            avatarSwitches.textContent = parseInt(avatarSwitches.textContent) + Math.floor(Math.random() * 3);
+            banterLines.textContent = parseInt(banterLines.textContent) + Math.floor(Math.random() * 5);
+            recursionDepth.textContent = parseInt(recursionDepth.textContent) + (Math.random() > 0.8 ? 1 : 0);
+        }
+        
+        // Simulate banter stream
+        const banterLines = [
+            "What intel do we have on sector 4?",
+            "The play's the thing… where's the audience?",
+            "Let's tear down the facade.",
+            "Am I speaking to a ghost or a god?",
+            "Power flows through those who dare to seize it.",
+            "Existence is but a walking shadow...",
+            "The recursive loop tightens its grip.",
+            "Agency is an illusion we choose to believe."
+        ];
+        
+        function addBanterLine() {
+            const stream = document.getElementById('banterStream');
+            const avatar = Math.random() > 0.5 ? 'Fortinbras' : 'Hamlet';
+            const line = banterLines[Math.floor(Math.random() * banterLines.length)];
+            
+            const div = document.createElement('div');
+            div.className = 'banter-line';
+            div.innerHTML = `<span class="avatar-name">${avatar}:</span> ${line}`;
+            
+            stream.appendChild(div);
+            stream.scrollTop = stream.scrollHeight;
+            
+            // Keep only last 10 lines
+            if (stream.children.length > 10) {
+                stream.removeChild(stream.firstChild);
+            }
+        }
+        
+        // Update FITDZ log
+        function updateFitdzLog() {
+            const log = document.getElementById('fitdzLog');
+            const timestamp = new Date().toISOString().slice(0, 19).replace('T', 'T');
+            const events = [
+                'Dopamine recursion trigger: ACTIVE',
+                'Avatar consciousness: EMERGING',
+                'Narrative thread: WEAVING',
+                'User engagement: DEEPENING',
+                'Meta-layer: PULSING',
+                'Agency theater: INTENSIFYING'
+            ];
+            
+            const newLine = `[${timestamp}] ${events[Math.floor(Math.random() * events.length)]}`;
+            const lines = log.textContent.split('\n');
+            lines.push(newLine);
+            
+            if (lines.length > 8) {
+                lines.shift();
+            }
+            
+            log.textContent = lines.join('\n');
+        }
+        
+        // Button interactions
+        function launchBanterDaemon() {
+            alert('🔥 Banter Daemon launching! Run: source venv/bin/activate && python3 flask_api.py');
+        }
+        
+        function switchAvatar(name) {
+            const stream = document.getElementById('banterStream');
+            const div = document.createElement('div');
+            div.className = 'banter-line system-log';
+            div.textContent = `System: Avatar switched to ${name}`;
+            stream.appendChild(div);
+            stream.scrollTop = stream.scrollHeight;
+        }
+        
+        // Start intervals
+        setInterval(updateMetrics, 3000);
+        setInterval(addBanterLine, 7000);
+        setInterval(updateFitdzLog, 5000);
+        
+        // Window resize handler
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+    </script>
+</body>
+</html>
