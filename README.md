@@ -76,5 +76,4 @@ But you're absolutely right about **TikTok** being the ultimate Faustian Mask. H
 TikTok is the purest expression of your recursive theater concept - users think they're choosing what to watch, but the algorithm is performing them. The Faustian bargain is invisible, elegant, total.
 
 Zuckerberg sold his soul clumsily. TikTok never had to - it just made the transaction irresistible. 🌿⚡
-# D
-# E
+
